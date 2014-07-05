@@ -6,8 +6,7 @@ import (
 )
 
 var (
-	apiEntryPoint string       = "https://api.wheresitup.com/v4"
-	httpClient    *http.Client = &http.Client{}
+	apiEntryPoint string = "https://api.wheresitup.com/v4"
 )
 
 type WIU struct {
@@ -32,5 +31,5 @@ func (api WIU) get(endpoint string) (*http.Response, error) {
 
 	api.setHeaders(req, nil)
 
-	return httpClient.Do(req)
+	return http.DefaultClient.Do(req)
 }
