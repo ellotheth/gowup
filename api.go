@@ -2,6 +2,7 @@ package gowup
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -66,6 +67,24 @@ func (api WIU) Jobs() (map[string]JobSummary, error) {
 	}
 
 	return jobs, nil
+}
+
+func (api WIU) Job(id string) (*Job, error) {
+	if _, err := hex.DecodeString(id); err != nil {
+		return nil, &Error{msg: "Invalid job ID '" + id + "': " + err.Error()}
+	}
+
+	response, err := api.get("jobs/" + id)
+	if err != nil {
+		return nil, err
+	}
+
+	job := &Job{}
+	if err := api.parse(response, job); err != nil {
+		return nil, err
+	}
+
+	return job, nil
 }
 
 func (api WIU) setHeaders(req *http.Request, headers map[string]string) {

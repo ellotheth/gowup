@@ -224,5 +224,36 @@ func (a *ApiTest) TestJobs() {
 	a.Equal("trace", job.Services[0].Tests[2], "should unmarshal services")
 }
 
+func (a *ApiTest) TestBadJobId() {
+	_, err := a.api.Job("herpderp")
+	a.Error(err, "should reject bad job ids")
+}
+
+func (a *ApiTest) TestJobWithSummary() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{
+		    "request": {
+		        "easy_time": "Sun, 29 Jun 2014 10:53:09 -0400",
+		        "expiry": {
+		            "sec": 1405263189,
+		            "usec": 0
+		        },
+		        "ip": "107.4.56.245",
+		        "start_time": 1404053589,
+		        "url": "https://google.com"
+		    }
+		}`))
+	}))
+	defer server.Close()
+	apiEntryPoint = server.URL
+
+	job, err := a.api.Job("aa")
+	a.NoError(err, "should not return an error")
+
+	a.Equal(1404053589, job.Summary.StartTime.Unix(), "should decode the start time")
+	a.Equal("107.4.56.245", job.Summary.Ip, "should decode the ip address")
+	a.Equal("https://google.com", job.Summary.Url.String(), "should decode the url")
+}
+
 // todo: test error handling for get
 // todo: test error handling for post
