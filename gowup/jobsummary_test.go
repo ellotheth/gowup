@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"net/url"
 	"testing"
+	"time"
 )
 
 type JobSummaryTest struct {
@@ -36,4 +37,12 @@ func (j *JobSummaryTest) TestUrlUnmarshalerInSummary() {
 
 	json.Unmarshal(data, &job)
 	j.Equal(expected, job.Url, "should unmarshal url fields to Urls")
+}
+
+func (j *JobSummaryTest) TestTimeUnmarshaler() {
+	job, start := JobSummary{}, time.Unix(1396972009, 0)
+	data, _ := json.Marshal(map[string]int64{"start_time": start.Unix()})
+
+	json.Unmarshal(data, &job)
+	j.Equal(Time(start), job.StartTime, "should unmarshal time fields correctly")
 }
