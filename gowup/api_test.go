@@ -41,6 +41,20 @@ func (a *ApiTest) TestSetCustomHeaders() {
 	a.Equal("foo", req.Header.Get("bar"), "should set bar header")
 }
 
+func (a *ApiTest) TestParse() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		raw, _ := json.Marshal([]int{1, 2, 3})
+		w.Write(raw)
+	}))
+	defer server.Close()
+	response, _ := http.Get(server.URL)
+
+	dest := make([]int, 3)
+	err := a.api.parse(response, &dest)
+	a.NoError(err, "should not return an error")
+	a.Equal([]int{1, 2, 3}, dest, "should have the right type and value")
+}
+
 func (a *ApiTest) TestGet() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 	endpoint := "foo"

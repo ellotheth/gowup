@@ -31,14 +31,8 @@ func (api WIU) Locations() ([]map[string]string, error) {
 		return nil, err
 	}
 
-	raw, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
 	var body map[string][]map[string]string
-	if err := json.Unmarshal(raw, &body); err != nil {
+	if err := api.parse(response, &body); err != nil {
 		return nil, err
 	}
 
@@ -57,6 +51,20 @@ func (api WIU) setHeaders(req *http.Request, headers map[string]string) {
 	for header, content := range headers {
 		req.Header.Add(header, content)
 	}
+}
+
+func (api WIU) parse(response *http.Response, body interface{}) error {
+	raw, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if err := json.Unmarshal(raw, body); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (api WIU) get(endpoint string) (*http.Response, error) {
