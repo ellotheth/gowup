@@ -10,11 +10,15 @@ type JobSummary struct {
 	Url       Url       `json:"url"`
 	Ip        string    `json:"ip"`
 	StartTime Time      `json:"start_time"`
+	Services  []Service `json:"services"`
+}
+
+type Service struct {
+	Server string   `json:"server"`
+	Tests  []string `json:"checks"`
 }
 
 type Url url.URL
-
-type Time time.Time
 
 func (u *Url) UnmarshalJSON(data []byte) error {
 	var raw string
@@ -33,6 +37,8 @@ func (u *Url) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+type Time time.Time
 
 // time.Time has an unmarshaler, but it assumes the JSON is coming in as a
 // string. ours is coming in as a float64.

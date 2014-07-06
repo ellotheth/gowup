@@ -46,3 +46,47 @@ func (j *JobSummaryTest) TestTimeUnmarshaler() {
 	json.Unmarshal(data, &job)
 	j.Equal(Time(start), job.StartTime, "should unmarshal time fields correctly")
 }
+
+func (j *JobSummaryTest) TestServicesUnmarshaler() {
+	data := []byte(`{ "services": [
+    {
+        "city": "denver",
+        "server": "denver",
+        "checks": [
+            "http",
+            "ping",
+            "trace",
+            "fast",
+            "dig"
+        ]
+    },
+    {
+        "city": "sydney",
+        "server": "sydney",
+        "checks": [
+            "http",
+            "ping",
+            "trace",
+            "fast",
+            "dig"
+        ]
+    },
+    {
+        "city": "riga",
+        "server": "riga",
+        "checks": [
+            "http",
+            "ping",
+            "trace",
+            "fast",
+            "dig"
+        ]
+    }
+]}`)
+
+	job := JobSummary{}
+	json.Unmarshal(data, &job)
+
+	j.Equal("http", job.Services[2].Tests[0], "should unmarshal the nested slices")
+	j.Equal("sydney", job.Services[1].Server, "should unmarshal the strings")
+}
