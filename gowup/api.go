@@ -19,18 +19,29 @@ func (e *Error) Error() string {
 	return e.msg
 }
 
+type Location struct {
+	Name      string `json:"name"`
+	Title     string `json:"title"`
+	City      string `json:"location"`
+	State     string `json:"state"`
+	Country   string `json:"country"`
+	Lat       string `json:"latitude"`
+	Lon       string `json:"longitutde"`
+	Continent string `json:"continent_name"`
+}
+
 type WIU struct {
 	Client string
 	Token  string
 }
 
-func (api WIU) Locations() ([]map[string]string, error) {
+func (api WIU) Locations() ([]Location, error) {
 	response, err := api.get("sources")
 	if err != nil {
 		return nil, err
 	}
 
-	var body map[string][]map[string]string
+	var body map[string][]Location
 	if err := api.parse(response, &body); err != nil {
 		return nil, err
 	}
