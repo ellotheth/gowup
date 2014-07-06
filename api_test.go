@@ -12,8 +12,7 @@ import (
 
 type ApiTest struct {
 	suite.Suite
-	server *httptest.Server
-	api    WIU
+	api WIU
 }
 
 func TestApi(t *testing.T) {
@@ -21,16 +20,7 @@ func TestApi(t *testing.T) {
 }
 
 func (apiSuite *ApiTest) SetupSuite() {
-	apiSuite.server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, _ := ioutil.ReadAll(r.Body)
-		w.Write(body)
-	}))
-	apiEntryPoint = apiSuite.server.URL
 	apiSuite.api = WIU{Client: "herp", Token: "derp"}
-}
-
-func (apiSuite *ApiTest) TearDownSuite() {
-	apiSuite.server.Close()
 }
 
 func (apiSuite *ApiTest) TestSetHeaderDefaults() {
@@ -52,9 +42,12 @@ func (apiSuite *ApiTest) TestSetCustomHeaders() {
 }
 
 func (apiSuite *ApiTest) TestGet() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 	endpoint := "foo"
 
+	apiEntryPoint = server.URL
 	response, err := apiSuite.api.get(endpoint)
+	server.Close()
 
 	apiSuite.Nil(err, "should not return an error")
 
@@ -66,6 +59,13 @@ func (apiSuite *ApiTest) TestGet() {
 }
 
 func (apiSuite *ApiTest) TestPost() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		w.Write(body)
+	}))
+	defer server.Close()
+
+	apiEntryPoint = server.URL
 	endpoint := "foo"
 	data := map[string]interface{}{"derp": "thing", "foo": []interface{}{"a", "string"}, "herp": 1}
 	marshaled, _ := json.Marshal(data)
@@ -88,6 +88,55 @@ func (apiSuite *ApiTest) TestPost() {
 	// var unmarshaled map[string]interface{}
 	// json.Unmarshal(body, &unmarshaled)
 	// assert.True(t, assert.ObjectsAreEqual(data, unmarshaled), "should decode to the right json")
+}
+
+func (apiSuite *ApiTest) TestLocations() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{
+    "sources": [
+        {
+            "id": "2",
+            "name": "toronto",
+            "title": "Toronto",
+            "location": "Toronto",
+            "state": "Ontario",
+            "country": "Canada",
+            "latitude": "43.6481",
+            "longitude": "-79.4042",
+            "continent_name": "North America"
+        },
+        {
+            "id": "12",
+            "name": "dallas",
+            "title": "Dallas",
+            "location": "Dallas",
+            "state": "Texas",
+            "country": "United States",
+            "latitude": "32.7828",
+            "longitude": "-96.8039",
+            "continent_name": "North America"
+        },
+        {
+            "id": "13",
+            "name": "newyork",
+            "title": "New York",
+            "location": "Garden City",
+            "state": "New York",
+            "country": "United States",
+            "latitude": "40.7269",
+            "longitude": "-73.6497",
+            "continent_name": "North America"
+        }
+    ]
+}`))
+	}))
+	defer server.Close()
+	apiEntryPoint = server.URL
+
+	sources, err := apiSuite.api.Locations()
+	apiSuite.Nil(err, "should not return an error")
+	apiSuite.Equal(3, len(sources), "should contain the full list of servers")
+	apiSuite.Equal("dallas", sources[1]["name"], "should have the same content as the raw json")
 }
 
 // todo: test error handling for get

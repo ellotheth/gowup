@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -11,9 +12,42 @@ var (
 	apiEntryPoint string = "https://api.wheresitup.com/v4"
 )
 
+type WIUError struct {
+	msg string
+}
+
+func (e *WIUError) Error() string {
+	return e.msg
+}
+
 type WIU struct {
 	Client string
 	Token  string
+}
+
+func (api WIU) Locations() ([]map[string]string, error) {
+	response, err := api.get("sources")
+	if err != nil {
+		return nil, err
+	}
+
+	raw, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	var body map[string][]map[string]string
+	if err := json.Unmarshal(raw, &body); err != nil {
+		return nil, err
+	}
+
+	sources, ok := body["sources"]
+	if !ok {
+		return nil, &WIUError{msg: "Locations missing from response"}
+	}
+
+	return sources, nil
 }
 
 func (api WIU) setHeaders(req *http.Request, headers map[string]string) {
