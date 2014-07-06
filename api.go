@@ -1,6 +1,8 @@
 package guppy
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -25,6 +27,22 @@ func (api WIU) setHeaders(req *http.Request, headers map[string]string) {
 
 func (api WIU) get(endpoint string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s", apiEntryPoint, endpoint), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	api.setHeaders(req, nil)
+
+	return http.DefaultClient.Do(req)
+}
+
+func (api WIU) post(endpoint string, data interface{}) (*http.Response, error) {
+	body, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/%s", apiEntryPoint, endpoint), bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
