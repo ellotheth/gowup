@@ -146,10 +146,21 @@ func (a *ApiTest) TestLocations() {
 	defer server.Close()
 	apiEntryPoint = server.URL
 
+	expected := Location{
+		Name:      "newyork",
+		Title:     "New York",
+		City:      "Garden City",
+		State:     "New York",
+		Country:   "United States",
+		Lat:       "40.7269",
+		Lon:       "-73.6497",
+		Continent: "North America",
+	}
+
 	sources, err := a.api.Locations()
 	a.Nil(err, "should not return an error")
 	a.Equal(3, len(sources), "should contain the full list of servers")
-	a.Equal("dallas", sources[1].Name, "should have the same content as the raw json")
+	a.Equal(expected, sources[2], "should have the same content as the raw json")
 }
 
 func (a *ApiTest) TestJobs() {

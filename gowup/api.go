@@ -26,7 +26,7 @@ type Location struct {
 	State     string `json:"state"`
 	Country   string `json:"country"`
 	Lat       string `json:"latitude"`
-	Lon       string `json:"longitutde"`
+	Lon       string `json:"longitude"`
 	Continent string `json:"continent_name"`
 }
 
