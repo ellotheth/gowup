@@ -106,42 +106,42 @@ func (a *ApiTest) TestPost() {
 func (a *ApiTest) TestLocations() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{
-    "sources": [
-        {
-            "id": "2",
-            "name": "toronto",
-            "title": "Toronto",
-            "location": "Toronto",
-            "state": "Ontario",
-            "country": "Canada",
-            "latitude": "43.6481",
-            "longitude": "-79.4042",
-            "continent_name": "North America"
-        },
-        {
-            "id": "12",
-            "name": "dallas",
-            "title": "Dallas",
-            "location": "Dallas",
-            "state": "Texas",
-            "country": "United States",
-            "latitude": "32.7828",
-            "longitude": "-96.8039",
-            "continent_name": "North America"
-        },
-        {
-            "id": "13",
-            "name": "newyork",
-            "title": "New York",
-            "location": "Garden City",
-            "state": "New York",
-            "country": "United States",
-            "latitude": "40.7269",
-            "longitude": "-73.6497",
-            "continent_name": "North America"
-        }
-    ]
-}`))
+		    "sources": [
+		        {
+		            "id": "2",
+		            "name": "toronto",
+		            "title": "Toronto",
+		            "location": "Toronto",
+		            "state": "Ontario",
+		            "country": "Canada",
+		            "latitude": "43.6481",
+		            "longitude": "-79.4042",
+		            "continent_name": "North America"
+		        },
+		        {
+		            "id": "12",
+		            "name": "dallas",
+		            "title": "Dallas",
+		            "location": "Dallas",
+		            "state": "Texas",
+		            "country": "United States",
+		            "latitude": "32.7828",
+		            "longitude": "-96.8039",
+		            "continent_name": "North America"
+		        },
+		        {
+		            "id": "13",
+		            "name": "newyork",
+		            "title": "New York",
+		            "location": "Garden City",
+		            "state": "New York",
+		            "country": "United States",
+		            "latitude": "40.7269",
+		            "longitude": "-73.6497",
+		            "continent_name": "North America"
+		        }
+		    ]
+		}`))
 	}))
 	defer server.Close()
 	apiEntryPoint = server.URL
@@ -166,48 +166,48 @@ func (a *ApiTest) TestLocations() {
 func (a *ApiTest) TestJobs() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{
-    "534419e98c3dcffa6170aeae": {
-        "url": "https://google.com",
-        "ip": "123.4.56.189",
-        "start_time": 1396972009,
-        "easy_time": "Tue, 08 Apr 2014 11:46:49 -0400",
-        "services": [
-            {
-                "city": "denver",
-                "server": "denver",
-                "checks": [
-                    "http",
-                    "ping",
-                    "trace",
-                    "fast",
-                    "dig"
-                ]
-            },
-            {
-                "city": "sydney",
-                "server": "sydney",
-                "checks": [
-                    "http",
-                    "ping",
-                    "trace",
-                    "fast",
-                    "dig"
-                ]
-            },
-            {
-                "city": "riga",
-                "server": "riga",
-                "checks": [
-                    "http",
-                    "ping",
-                    "trace",
-                    "fast",
-                    "dig"
-                ]
-            }
-        ]
-    }
-}`))
+		    "534419e98c3dcffa6170aeae": {
+		        "url": "https://google.com",
+		        "ip": "123.4.56.189",
+		        "start_time": 1396972009,
+		        "easy_time": "Tue, 08 Apr 2014 11:46:49 -0400",
+		        "services": [
+		            {
+		                "city": "denver",
+		                "server": "denver",
+		                "checks": [
+		                    "http",
+		                    "ping",
+		                    "trace",
+		                    "fast",
+		                    "dig"
+		                ]
+		            },
+		            {
+		                "city": "sydney",
+		                "server": "sydney",
+		                "checks": [
+		                    "http",
+		                    "ping",
+		                    "trace",
+		                    "fast",
+		                    "dig"
+		                ]
+		            },
+		            {
+		                "city": "riga",
+		                "server": "riga",
+		                "checks": [
+		                    "http",
+		                    "ping",
+		                    "trace",
+		                    "fast",
+		                    "dig"
+		                ]
+		            }
+		        ]
+		    }
+		}`))
 	}))
 	defer server.Close()
 	apiEntryPoint = server.URL

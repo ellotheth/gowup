@@ -49,40 +49,40 @@ func (j *JobSummaryTest) TestTimeUnmarshaler() {
 
 func (j *JobSummaryTest) TestServicesUnmarshaler() {
 	data := []byte(`{ "services": [
-    {
-        "city": "denver",
-        "server": "denver",
-        "checks": [
-            "http",
-            "ping",
-            "trace",
-            "fast",
-            "dig"
-        ]
-    },
-    {
-        "city": "sydney",
-        "server": "sydney",
-        "checks": [
-            "http",
-            "ping",
-            "trace",
-            "fast",
-            "dig"
-        ]
-    },
-    {
-        "city": "riga",
-        "server": "riga",
-        "checks": [
-            "http",
-            "ping",
-            "trace",
-            "fast",
-            "dig"
-        ]
-    }
-]}`)
+	    {
+	        "city": "denver",
+	        "server": "denver",
+	        "checks": [
+	            "http",
+	            "ping",
+	            "trace",
+	            "fast",
+	            "dig"
+	        ]
+	    },
+	    {
+	        "city": "sydney",
+	        "server": "sydney",
+	        "checks": [
+	            "http",
+	            "ping",
+	            "trace",
+	            "fast",
+	            "dig"
+	        ]
+	    },
+	    {
+	        "city": "riga",
+	        "server": "riga",
+	        "checks": [
+	            "http",
+	            "ping",
+	            "trace",
+	            "fast",
+	            "dig"
+	        ]
+	    }
+	]}`)
 
 	job := JobSummary{}
 	json.Unmarshal(data, &job)
