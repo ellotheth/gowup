@@ -203,13 +203,14 @@ func (a *ApiTest) TestJobs() {
 
 	jobs, err := a.api.Jobs()
 	a.NoError(err, "should not return an error")
+
 	job, ok := jobs["534419e98c3dcffa6170aeae"]
 	a.True(ok, "job should exist in jobs")
-	a.Equal("https://google.com", job["url"].(string), "should have the same content as the raw json")
-	a.Equal(1396972009, job["start_time"].(float64), "should use the right types")
 
-	// todo: WOW is this not going to cut it.
-	a.Equal("trace", job["services"].([]interface{})[0].(map[string]interface{})["checks"].([]interface{})[2].(string), "should have the right nested content")
+	a.Equal("https://google.com", job.Url.String(), "should unmarshal urls")
+	a.Equal(1396972009, job.StartTime.Unix(), "should unmarshal time")
+	a.Equal("123.4.56.189", job.Ip, "should unmarshal IP address")
+	a.Equal("trace", job.Services[0].Tests[2], "should unmarshal services")
 }
 
 // todo: test error handling for get

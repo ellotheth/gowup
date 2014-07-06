@@ -18,7 +18,9 @@ type Service struct {
 	Tests  []string `json:"checks"`
 }
 
-type Url url.URL
+type Url struct {
+	*url.URL
+}
 
 func (u *Url) UnmarshalJSON(data []byte) error {
 	var raw string
@@ -33,12 +35,14 @@ func (u *Url) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	*u = Url(*parsed)
+	u.URL = parsed
 
 	return nil
 }
 
-type Time time.Time
+type Time struct {
+	time.Time
+}
 
 // time.Time has an unmarshaler, but it assumes the JSON is coming in as a
 // string. ours is coming in as a float64.
@@ -50,8 +54,8 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	// parse the string into a Url
-	*t = Time(time.Unix(int64(raw), 0))
+	// parse the float to a Time
+	t.Time = time.Unix(int64(raw), 0)
 
 	return nil
 }

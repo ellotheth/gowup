@@ -54,13 +54,13 @@ func (api WIU) Locations() ([]Location, error) {
 	return sources, nil
 }
 
-func (api WIU) Jobs() (map[string]map[string]interface{}, error) {
+func (api WIU) Jobs() (map[string]JobSummary, error) {
 	response, err := api.get("jobs")
 	if err != nil {
 		return nil, err
 	}
 
-	var jobs map[string]map[string]interface{}
+	var jobs map[string]JobSummary
 	if err := api.parse(response, &jobs); err != nil {
 		return nil, err
 	}

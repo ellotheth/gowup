@@ -21,7 +21,7 @@ func (j *JobSummaryTest) TestUrlUnmarshaler() {
 	data, _ := json.Marshal(urlstring)
 
 	parsed, _ := url.Parse(urlstring)
-	expected := Url(*parsed)
+	expected := Url{URL: parsed}
 
 	json.Unmarshal(data, &actual)
 	j.Equal(expected, actual, "should unmarshal urls to a Url type")
@@ -33,18 +33,18 @@ func (j *JobSummaryTest) TestUrlUnmarshalerInSummary() {
 	data, _ := json.Marshal(map[string]string{"url": urlstring})
 
 	parsed, _ := url.Parse(urlstring)
-	expected := Url(*parsed)
+	expected := Url{URL: parsed}
 
 	json.Unmarshal(data, &job)
 	j.Equal(expected, job.Url, "should unmarshal url fields to Urls")
 }
 
 func (j *JobSummaryTest) TestTimeUnmarshaler() {
-	job, start := JobSummary{}, time.Unix(1396972009, 0)
+	job, start := JobSummary{}, Time{Time: time.Unix(1396972009, 0)}
 	data, _ := json.Marshal(map[string]int64{"start_time": start.Unix()})
 
 	json.Unmarshal(data, &job)
-	j.Equal(Time(start), job.StartTime, "should unmarshal time fields correctly")
+	j.Equal(start, job.StartTime, "should unmarshal time fields correctly")
 }
 
 func (j *JobSummaryTest) TestServicesUnmarshaler() {
