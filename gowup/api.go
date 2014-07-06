@@ -11,11 +11,11 @@ var (
 	apiEntryPoint string = "https://api.wheresitup.com/v4"
 )
 
-type WIUError struct {
+type Error struct {
 	msg string
 }
 
-func (e *WIUError) Error() string {
+func (e *Error) Error() string {
 	return e.msg
 }
 
@@ -37,7 +37,7 @@ func (api WIU) Locations() ([]map[string]string, error) {
 
 	sources, ok := body["sources"]
 	if !ok {
-		return nil, &WIUError{msg: "Locations missing from response"}
+		return nil, &Error{msg: "Locations missing from response"}
 	}
 
 	return sources, nil
