@@ -2,7 +2,6 @@ package gowup
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/stretchr/testify/suite"
 	"io/ioutil"
 	"net/http"
@@ -67,7 +66,7 @@ func (a *ApiTest) TestGet() {
 
 	r := response.Request
 	a.Equal("GET", r.Method, "should be a GET")
-	a.Equal(fmt.Sprintf("/%s", endpoint), r.URL.Path, "should be the right endpoint")
+	a.Equal("/"+endpoint, r.URL.Path, "should be the right endpoint")
 
 	// todo: how do i confirm setHeaders was run?
 }
@@ -91,7 +90,7 @@ func (a *ApiTest) TestPost() {
 	defer response.Body.Close()
 
 	a.Equal("POST", response.Request.Method, "should be a POST")
-	a.Equal(fmt.Sprintf("/%s", endpoint), response.Request.URL.Path, "should be the right endpoint")
+	a.Equal("/"+endpoint, response.Request.URL.Path, "should be the right endpoint")
 	a.Equal(marshaled, body, "should post json data")
 
 	// apparently comparing maps is complicated. or json.Unmarshal is flaky.
