@@ -43,6 +43,20 @@ func (api WIU) Locations() ([]map[string]string, error) {
 	return sources, nil
 }
 
+func (api WIU) Jobs() (map[string]map[string]interface{}, error) {
+	response, err := api.get("jobs")
+	if err != nil {
+		return nil, err
+	}
+
+	var jobs map[string]map[string]interface{}
+	if err := api.parse(response, &jobs); err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
 func (api WIU) setHeaders(req *http.Request, headers map[string]string) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Auth", "Bearer "+api.Client+" "+api.Token)
