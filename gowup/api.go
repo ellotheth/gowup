@@ -1,4 +1,4 @@
-package guppy
+package gowup
 
 import (
 	"bytes"

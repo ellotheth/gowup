@@ -1,4 +1,4 @@
-package guppy
+package gowup
 
 import (
 	"encoding/json"
@@ -19,46 +19,46 @@ func TestApi(t *testing.T) {
 	suite.Run(t, new(ApiTest))
 }
 
-func (apiSuite *ApiTest) SetupSuite() {
-	apiSuite.api = WIU{Client: "herp", Token: "derp"}
+func (a *ApiTest) SetupSuite() {
+	a.api = WIU{Client: "herp", Token: "derp"}
 }
 
-func (apiSuite *ApiTest) TestSetHeaderDefaults() {
+func (a *ApiTest) TestSetHeaderDefaults() {
 	req, _ := http.NewRequest("GET", "", nil)
 
-	apiSuite.api.setHeaders(req, nil)
+	a.api.setHeaders(req, nil)
 
-	apiSuite.Equal("application/json", req.Header.Get("Content-Type"), "should have a json content type")
-	apiSuite.Equal("Bearer herp derp", req.Header.Get("Auth"), "should set client auth")
+	a.Equal("application/json", req.Header.Get("Content-Type"), "should have a json content type")
+	a.Equal("Bearer herp derp", req.Header.Get("Auth"), "should set client auth")
 }
 
-func (apiSuite *ApiTest) TestSetCustomHeaders() {
+func (a *ApiTest) TestSetCustomHeaders() {
 	req, _ := http.NewRequest("GET", "", nil)
 
-	apiSuite.api.setHeaders(req, map[string]string{"herp": "derp", "bar": "foo"})
+	a.api.setHeaders(req, map[string]string{"herp": "derp", "bar": "foo"})
 
-	apiSuite.Equal("derp", req.Header.Get("herp"), "should set herp header")
-	apiSuite.Equal("foo", req.Header.Get("bar"), "should set bar header")
+	a.Equal("derp", req.Header.Get("herp"), "should set herp header")
+	a.Equal("foo", req.Header.Get("bar"), "should set bar header")
 }
 
-func (apiSuite *ApiTest) TestGet() {
+func (a *ApiTest) TestGet() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 	endpoint := "foo"
 
 	apiEntryPoint = server.URL
-	response, err := apiSuite.api.get(endpoint)
+	response, err := a.api.get(endpoint)
 	server.Close()
 
-	apiSuite.Nil(err, "should not return an error")
+	a.Nil(err, "should not return an error")
 
 	r := response.Request
-	apiSuite.Equal("GET", r.Method, "should be a GET")
-	apiSuite.Equal(fmt.Sprintf("/%s", endpoint), r.URL.Path, "should be the right endpoint")
+	a.Equal("GET", r.Method, "should be a GET")
+	a.Equal(fmt.Sprintf("/%s", endpoint), r.URL.Path, "should be the right endpoint")
 
 	// todo: how do i confirm setHeaders was run?
 }
 
-func (apiSuite *ApiTest) TestPost() {
+func (a *ApiTest) TestPost() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := ioutil.ReadAll(r.Body)
 		w.Write(body)
@@ -70,15 +70,15 @@ func (apiSuite *ApiTest) TestPost() {
 	data := map[string]interface{}{"derp": "thing", "foo": []interface{}{"a", "string"}, "herp": 1}
 	marshaled, _ := json.Marshal(data)
 
-	response, err := apiSuite.api.post(endpoint, data)
-	apiSuite.Nil(err, "should not return an error")
+	response, err := a.api.post(endpoint, data)
+	a.Nil(err, "should not return an error")
 
 	body, _ := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 
-	apiSuite.Equal("POST", response.Request.Method, "should be a POST")
-	apiSuite.Equal(fmt.Sprintf("/%s", endpoint), response.Request.URL.Path, "should be the right endpoint")
-	apiSuite.Equal(marshaled, body, "should post json data")
+	a.Equal("POST", response.Request.Method, "should be a POST")
+	a.Equal(fmt.Sprintf("/%s", endpoint), response.Request.URL.Path, "should be the right endpoint")
+	a.Equal(marshaled, body, "should post json data")
 
 	// apparently comparing maps is complicated. or json.Unmarshal is flaky.
 	// this comparison is USUALLY fine, but sometimes it fails for literally no
@@ -90,7 +90,7 @@ func (apiSuite *ApiTest) TestPost() {
 	// assert.True(t, assert.ObjectsAreEqual(data, unmarshaled), "should decode to the right json")
 }
 
-func (apiSuite *ApiTest) TestLocations() {
+func (a *ApiTest) TestLocations() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{
     "sources": [
@@ -133,10 +133,10 @@ func (apiSuite *ApiTest) TestLocations() {
 	defer server.Close()
 	apiEntryPoint = server.URL
 
-	sources, err := apiSuite.api.Locations()
-	apiSuite.Nil(err, "should not return an error")
-	apiSuite.Equal(3, len(sources), "should contain the full list of servers")
-	apiSuite.Equal("dallas", sources[1]["name"], "should have the same content as the raw json")
+	sources, err := a.api.Locations()
+	a.Nil(err, "should not return an error")
+	a.Equal(3, len(sources), "should contain the full list of servers")
+	a.Equal("dallas", sources[1]["name"], "should have the same content as the raw json")
 }
 
 // todo: test error handling for get
