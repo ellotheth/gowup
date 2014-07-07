@@ -98,3 +98,29 @@ func (j *JobSummaryTest) TestServicesUnmarshaler() {
 	j.Equal("http", job.Services[2].Tests[0], "should unmarshal the nested slices")
 	j.Equal("sydney", job.Services[1].Server, "should unmarshal the strings")
 }
+
+func (j *JobSummaryTest) TestJobDetailUnmarshaler() {
+	data := []byte(`{
+            "denver": {
+                "fast": {
+                    "raw": {},
+                    "summary": {"herp": "derp"}
+                }
+            },
+            "tokyo": {
+                "trace": {
+                    "raw": {},
+                    "summary": [1, 2]
+                }
+            }
+        }`)
+
+	detail := JobDetail{}
+	json.Unmarshal(data, &detail)
+	j.Equal(map[string]interface{}{"herp": "derp"}, detail["denver"]["fast"], "should unmarshal populated objects")
+	j.Equal([]interface{}{1, 2}, detail["tokyo"]["trace"], "should unmarshal populated arrays")
+
+	data = []byte(`[]`)
+	json.Unmarshal(data, &detail)
+	j.Equal(JobDetail{}, detail)
+}

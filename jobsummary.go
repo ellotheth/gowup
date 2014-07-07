@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type Job struct {
+	Summary JobSummary `json:"request"`
+	Details JobDetails `json:"response"`
+}
+
 type JobSummary struct {
 	Url        Url       `json:"url"`
 	Ip         string    `json:"ip"`
@@ -17,6 +22,44 @@ type JobSummary struct {
 type Service struct {
 	Server string   `json:"server"`
 	Tests  []string `json:"checks"`
+}
+
+type JobDetails struct {
+	Done    JobDetail `json:"complete"`
+	NotDone JobDetail `json:"in_progress"`
+	Error   JobDetail `json:"error"`
+}
+
+type JobDetail map[string]map[string]interface{}
+
+func (j *JobDetail) UnmarshalJSON(data []byte) error {
+	var raw interface{}
+
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	switch v := raw.(type) {
+	case []interface{}:
+		*j = JobDetail{}
+	case map[string]interface{}:
+		job := JobDetail{}
+
+		// there must be a better way.
+		for city, tests := range v {
+			job[city] = map[string]interface{}{}
+			for test, details := range tests.(map[string]interface{}) {
+				content, ok := details.(map[string]interface{})["summary"]
+				if ok {
+					job[city][test] = content
+				}
+			}
+		}
+		*j = job
+
+	}
+
+	return nil
 }
 
 type Url struct {

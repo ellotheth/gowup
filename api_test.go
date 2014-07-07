@@ -256,5 +256,45 @@ func (a *ApiTest) TestJobWithSummaryOnly() {
 	a.Equal("https://google.com", job.Summary.Url.String(), "should decode the url")
 }
 
+func (a *ApiTest) TestJobDetails() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{
+		    "request": {
+		        "easy_time": "Sun, 29 Jun 2014 10:53:09 -0400",
+		        "expiry": {
+		            "sec": 1405263189,
+		            "usec": 0
+		        },
+		        "ip": "107.4.56.245",
+		        "start_time": 1404053589,
+		        "url": "https://google.com"
+		    },
+		    "response": {
+		        "complete": {
+		            "denver": {
+		                "fast": {
+		                    "raw": { "some": "random content" },
+		                    "summary": { "some": "random content" }
+		                }
+		            }
+		        },
+		        "error": [],
+		        "in_progress": []
+		    }
+		}`))
+	}))
+	defer server.Close()
+	apiEntryPoint = server.URL
+
+	job, err := a.api.Job("aa")
+	a.NoError(err, "should not return an error")
+	a.Equal(
+		map[string]interface{}{"some": "random content"},
+		job.Details.Done["denver"]["fast"],
+		"should decode deeply nested json",
+	)
+	a.Equal(JobDetail{}, job.Details.Error, "should decode empty details to nil")
+}
+
 // todo: test error handling for get
 // todo: test error handling for post
