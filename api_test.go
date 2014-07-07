@@ -229,7 +229,7 @@ func (a *ApiTest) TestBadJobId() {
 	a.Error(err, "should reject bad job ids")
 }
 
-func (a *ApiTest) TestJobWithSummary() {
+func (a *ApiTest) TestJobWithSummaryOnly() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{
 		    "request": {
@@ -251,6 +251,7 @@ func (a *ApiTest) TestJobWithSummary() {
 	a.NoError(err, "should not return an error")
 
 	a.Equal(1404053589, job.Summary.StartTime.Unix(), "should decode the start time")
+	a.Equal(1405263189, job.Summary.ExpireTime.Unix(), "should decode the expiration time")
 	a.Equal("107.4.56.245", job.Summary.Ip, "should decode the ip address")
 	a.Equal("https://google.com", job.Summary.Url.String(), "should decode the url")
 }

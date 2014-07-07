@@ -47,6 +47,14 @@ func (j *JobSummaryTest) TestTimeUnmarshaler() {
 	j.Equal(start, job.StartTime, "should unmarshal time fields correctly")
 }
 
+func (j *JobSummaryTest) TestExpireTimeUnmarshaler() {
+	job, start := JobSummary{}, Time{Time: time.Unix(1396972009, 0)}
+	data, _ := json.Marshal(map[string]map[string]int64{"expiry": {"sec": start.Unix()}})
+
+	json.Unmarshal(data, &job)
+	j.Equal(start, job.ExpireTime, "should unmarshal expiration time correctly")
+}
+
 func (j *JobSummaryTest) TestServicesUnmarshaler() {
 	data := []byte(`{ "services": [
 	    {
