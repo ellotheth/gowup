@@ -296,5 +296,84 @@ func (a *ApiTest) TestJobDetails() {
 	a.Equal(JobDetail{}, job.Details.Error, "should decode empty details to nil")
 }
 
+func (a *ApiTest) TestEmptySubmission() {
+	_, err := a.api.Submit(nil)
+	a.Error(err, "should error on an empty submission")
+	a.Equal("Nothing to submit", err.Error())
+}
+
+func (a *ApiTest) TestSubmissionPostFailure() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "derp", 400)
+	}))
+	defer server.Close()
+	apiEntryPoint = server.URL
+
+	_, err := a.api.Submit(&JobRequest{})
+	a.Error(err, "should throw an error if the server breaks")
+	a.Contains(err.Error(), "invalid character")
+}
+
+func (a *ApiTest) TestJobRequestMarshaling() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+
+		var req JobRequest
+		json.Unmarshal(body, &req)
+
+		a.Equal("https://foo/bar?herp=derp", req.Url, "should encode the full url")
+		a.Equal([]string{"foo", "bar"}, req.Tests, "should encode the tests array")
+		a.Equal([]string{"herp", "derp"}, req.Locations, "should encode sources array")
+	}))
+	defer server.Close()
+	apiEntryPoint = server.URL
+
+	req := JobRequest{
+		Url:       "https://foo/bar?herp=derp",
+		Tests:     []string{"foo", "bar"},
+		Locations: []string{"herp", "derp"},
+	}
+	a.api.Submit(&req)
+}
+
+func (a *ApiTest) TestBadServerData() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		data, _ := json.Marshal("NOPE")
+		w.Write(data)
+	}))
+	defer server.Close()
+	apiEntryPoint = server.URL
+
+	_, err := a.api.Submit(&JobRequest{})
+	a.Error(err, "should throw an error if the data is the wrong format")
+	a.Contains(err.Error(), "cannot unmarshal string")
+}
+
+func (a *ApiTest) TestMissingJobID() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		data, _ := json.Marshal(map[string]string{"message": "nope"})
+		w.Write(data)
+	}))
+	defer server.Close()
+	apiEntryPoint = server.URL
+
+	_, err := a.api.Submit(&JobRequest{})
+	a.Error(err, "should throw an error if there's no job id")
+	a.Equal("Submission failed", err.Error())
+}
+
+func (a *ApiTest) TestJobID() {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		data, _ := json.Marshal(map[string]string{"jobID": "herpderp"})
+		w.Write(data)
+	}))
+	defer server.Close()
+	apiEntryPoint = server.URL
+
+	id, err := a.api.Submit(&JobRequest{})
+	a.NoError(err, "should not return an error")
+	a.Equal("herpderp", id, "should match the job id sent")
+}
+
 // todo: test error handling for get
 // todo: test error handling for post

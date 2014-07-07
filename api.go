@@ -87,6 +87,29 @@ func (api WIU) Job(id string) (*Job, error) {
 	return job, nil
 }
 
+func (api WIU) Submit(req *JobRequest) (string, error) {
+	if req == nil {
+		return "", &Error{msg: "Nothing to submit"}
+	}
+
+	response, err := api.post("jobs", req)
+	if err != nil {
+		return "", err
+	}
+
+	posted := map[string]string{}
+	if err := api.parse(response, &posted); err != nil {
+		return "", err
+	}
+
+	id, ok := posted["jobID"]
+	if !ok {
+		return "", &Error{msg: "Submission failed"}
+	}
+
+	return id, nil
+}
+
 func (api WIU) setHeaders(req *http.Request, headers map[string]string) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Auth", "Bearer "+api.Client+" "+api.Token)

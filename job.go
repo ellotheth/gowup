@@ -24,6 +24,12 @@ type Service struct {
 	Tests  []string `json:"checks"`
 }
 
+type JobRequest struct {
+	Url       string   `json:"uri"`
+	Tests     []string `json:"tests"`
+	Locations []string `json:"sources"`
+}
+
 type JobDetails struct {
 	Done    JobDetail `json:"complete"`
 	NotDone JobDetail `json:"in_progress"`
@@ -101,6 +107,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 	// this is just freaking black magic right here, i don't even know
 	switch v := raw.(type) {
 	case float64:
+		// there's an easier way to do this with json flags. oops
 		t.Time = time.Unix(int64(v), 0)
 	case map[string]interface{}:
 		sec, ok := v["sec"].(float64)
